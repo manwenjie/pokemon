@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>寶可夢屬性猜拳大對決</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🔥💧🌿 寶可夢屬性猜拳</h1>
+      <p class="subtitle">選擇屬性 → 抽取寶可夢 → 對決！</p>
+    </header>
+
+    <div class="score-board">
+      <div class="score">勝利：<span id="wins">0</span></div>
+      <div class="score">失敗：<span id="losses">0</span></div>
+      <div class="score">平手：<span id="draws">0</span></div>
+      <div class="score streak">連勝：<span id="streak">0</span></div>
+    </div>
+
+    <div class="type-select" id="typeSelect">
+      <p>先選擇你的屬性（像剪刀石頭布）：</p>
+      <div class="type-buttons">
+        <button class="type-btn fire" data-type="fire">🔥 火</button>
+        <button class="type-btn water" data-type="water">💧 水</button>
+        <button class="type-btn grass" data-type="grass">🌿 草</button>
+      </div>
+    </div>
+
+    <div class="draw-area hidden" id="drawArea">
+      <p>你選擇了：<span id="playerTypeText"></span></p>
+      <button id="drawBtn" class="draw-btn">✨ 抽寶可夢！</button>
+    </div>
+
+    <div class="battle-area hidden" id="battleArea">
+      <div class="pokemon-card player-card">
+        <div class="card-label">你的寶可夢</div>
+        <div class="pokemon-sprite" id="playerSprite">❓</div>
+        <div class="pokemon-name" id="playerName">---</div>
+        <div class="pokemon-type" id="playerTypeBadge"></div>
+      </div>
+
+      <div class="vs">VS</div>
+
+      <div class="pokemon-card opponent-card">
+        <div class="card-label">對手寶可夢</div>
+        <div class="pokemon-sprite" id="opponentSprite">❓</div>
+        <div class="pokemon-name" id="opponentName">---</div>
+        <div class="pokemon-type" id="opponentTypeBadge"></div>
+      </div>
+    </div>
+
+    <div class="result hidden" id="resultArea">
+      <p id="resultText"></p>
+      <button id="nextRoundBtn" class="next-btn">再來一局</button>
+    </div>
+
+    <div class="collection">
+      <h2>📖 我的圖鑑 <span id="collectionCount">(0)</span></h2>
+      <div class="collection-list" id="collectionList">
+        <p class="empty">還沒有收集到任何寶可夢喔～贏了就會加入！</p>
+      </div>
+    </div>
+
+    <footer>
+      <p>純前端小遊戲 · 可直接上架 GitHub Pages</p>
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
