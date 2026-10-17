@@ -1,31 +1,31 @@
-// 寶可夢資料（使用 emoji 模擬像素風格圖示，之後可換成真實像素圖）
+// 寶可夢資料（使用真實像素精靈圖）
 const pokemonData = {
   fire: [
-    { name: "小火龍", sprite: "🔥🦎", rarity: "common" },
-    { name: "六尾", sprite: "🦊🔥", rarity: "common" },
-    { name: "卡蒂狗", sprite: "🐕🔥", rarity: "common" },
-    { name: "小火馬", sprite: "🐴🔥", rarity: "common" },
-    { name: "火伊布", sprite: "🔥🦊", rarity: "uncommon" },
-    { name: "噴火龍", sprite: "🐲🔥", rarity: "rare" },
-    { name: "火焰鳥", sprite: "🔥🐦", rarity: "rare" }
+    { name: "小火龍", id: 4, rarity: "common" },
+    { name: "六尾", id: 37, rarity: "common" },
+    { name: "卡蒂狗", id: 58, rarity: "common" },
+    { name: "小火馬", id: 77, rarity: "common" },
+    { name: "火伊布", id: 136, rarity: "uncommon" },
+    { name: "噴火龍", id: 6, rarity: "rare" },
+    { name: "火焰鳥", id: 146, rarity: "rare" }
   ],
   water: [
-    { name: "傑尼龜", sprite: "🐢💧", rarity: "common" },
-    { name: "可達鴨", sprite: "🦆💧", rarity: "common" },
-    { name: "鯉魚王", sprite: "🐟💧", rarity: "common" },
-    { name: "小鋸鱷", sprite: "🐊💧", rarity: "common" },
-    { name: "水伊布", sprite: "💧🦊", rarity: "uncommon" },
-    { name: "水箭龜", sprite: "🐢💦", rarity: "rare" },
-    { name: "急凍鳥", sprite: "❄️🐦", rarity: "rare" }
+    { name: "傑尼龜", id: 7, rarity: "common" },
+    { name: "可達鴨", id: 54, rarity: "common" },
+    { name: "鯉魚王", id: 129, rarity: "common" },
+    { name: "小鋸鱷", id: 158, rarity: "common" },
+    { name: "水伊布", id: 134, rarity: "uncommon" },
+    { name: "水箭龜", id: 9, rarity: "rare" },
+    { name: "急凍鳥", id: 144, rarity: "rare" }
   ],
   grass: [
-    { name: "妙蛙種子", sprite: "🌱🐸", rarity: "common" },
-    { name: "走路草", sprite: "🌿", rarity: "common" },
-    { name: "喇叭芽", sprite: "🪴", rarity: "common" },
-    { name: "菊草葉", sprite: "🍃", rarity: "common" },
-    { name: "葉伊布", sprite: "🌿🦊", rarity: "uncommon" },
-    { name: "妙蛙花", sprite: "🌺🐸", rarity: "rare" },
-    { name: "閃電鳥", sprite: "⚡🐦", rarity: "rare" }
+    { name: "妙蛙種子", id: 1, rarity: "common" },
+    { name: "走路草", id: 43, rarity: "common" },
+    { name: "喇叭芽", id: 69, rarity: "common" },
+    { name: "菊草葉", id: 152, rarity: "common" },
+    { name: "葉伊布", id: 470, rarity: "uncommon" },
+    { name: "妙蛙花", id: 3, rarity: "rare" },
+    { name: "閃電鳥", id: 145, rarity: "rare" }
   ]
 };
 
@@ -40,6 +40,11 @@ const typeBeats = {
   grass: "water",
   water: "fire"
 };
+
+// 取得精靈圖網址（使用像素風格）
+function getSpriteUrl(id) {
+  return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`;
+}
 
 // 狀態
 let playerType = null;
@@ -90,23 +95,18 @@ document.querySelectorAll(".type-btn").forEach(btn => {
 drawBtn.addEventListener("click", () => {
   drawBtn.disabled = true;
 
-  // 玩家抽
   playerPokemon = getRandomPokemon(playerType);
 
-  // 電腦隨機屬性 + 抽
   const types = ["fire", "water", "grass"];
   opponentType = types[Math.floor(Math.random() * 3)];
   opponentPokemon = getRandomPokemon(opponentType);
 
-  // 顯示對戰區
   drawArea.classList.add("hidden");
   battleArea.classList.remove("hidden");
 
-  // 更新畫面
   updatePokemonCard("player", playerPokemon, playerType);
   updatePokemonCard("opponent", opponentPokemon, opponentType);
 
-  // 稍微延遲再顯示結果
   setTimeout(() => {
     const outcome = decideWinner(playerType, opponentType);
     showResult(outcome);
@@ -129,19 +129,22 @@ function getRandomPokemon(type) {
 }
 
 function updatePokemonCard(who, poke, type) {
+  const imgHtml = `<img src="\( {getSpriteUrl(poke.id)}" alt=" \){poke.name}" style="width:80px; height:80px; image-rendering: pixelated;">`;
+
   if (who === "player") {
-    playerSprite.textContent = poke.sprite;
+    playerSprite.innerHTML = imgHtml;
     playerSprite.classList.add("bounce");
     playerName.textContent = poke.name;
     playerTypeBadge.textContent = typeNames[type];
     playerTypeBadge.className = "pokemon-type " + type;
   } else {
-    opponentSprite.textContent = poke.sprite;
+    opponentSprite.innerHTML = imgHtml;
     opponentSprite.classList.add("bounce");
     opponentName.textContent = poke.name;
     opponentTypeBadge.textContent = typeNames[type];
     opponentTypeBadge.className = "pokemon-type " + type;
   }
+
   setTimeout(() => {
     playerSprite.classList.remove("bounce");
     opponentSprite.classList.remove("bounce");
@@ -164,7 +167,7 @@ function showResult(outcome) {
     resultText.textContent = `🎉 勝利！你的 ${playerPokemon.name} 贏了！`;
     if (!collection.has(playerPokemon.name)) {
       collection.add(playerPokemon.name);
-      addToCollection(playerPokemon, playerType);
+      addToCollection(playerPokemon);
     }
   } else if (outcome === "lose") {
     losses++;
@@ -178,14 +181,14 @@ function showResult(outcome) {
   updateScore();
 }
 
-function addToCollection(poke, type) {
+function addToCollection(poke) {
   const empty = collectionList.querySelector(".empty");
   if (empty) empty.remove();
 
   const item = document.createElement("div");
   item.className = "collection-item";
   item.innerHTML = `
-    <span class="sprite">${poke.sprite}</span>
+    <img src="\( {getSpriteUrl(poke.id)}" alt=" \){poke.name}" style="width:32px; height:32px; image-rendering: pixelated;">
     <span>${poke.name}</span>
   `;
   collectionList.appendChild(item);
@@ -211,11 +214,11 @@ function resetRound() {
   resultArea.classList.add("hidden");
   drawBtn.disabled = false;
 
-  playerSprite.textContent = "❓";
+  playerSprite.innerHTML = "❓";
   playerName.textContent = "---";
   playerTypeBadge.textContent = "";
   playerTypeBadge.className = "pokemon-type";
-  opponentSprite.textContent = "❓";
+  opponentSprite.innerHTML = "❓";
   opponentName.textContent = "---";
   opponentTypeBadge.textContent = "";
   opponentTypeBadge.className = "pokemon-type";
