@@ -7,7 +7,7 @@ const pokemonData = {
     { name: "小火馬", sprite: "🐴🔥", rarity: "common" },
     { name: "火伊布", sprite: "🔥🦊", rarity: "uncommon" },
     { name: "噴火龍", sprite: "🐲🔥", rarity: "rare" },
-    { name: "火焰鳥", sprite: "🐦‍🔥", rarity: "rare" }
+    { name: "火焰鳥", sprite: "🔥🐦", rarity: "rare" }
   ],
   water: [
     { name: "傑尼龜", sprite: "🐢💧", rarity: "common" },
@@ -16,7 +16,7 @@ const pokemonData = {
     { name: "小鋸鱷", sprite: "🐊💧", rarity: "common" },
     { name: "水伊布", sprite: "💧🦊", rarity: "uncommon" },
     { name: "水箭龜", sprite: "🐢💦", rarity: "rare" },
-    { name: "急凍鳥", sprite: "🐦❄️", rarity: "rare" }
+    { name: "急凍鳥", sprite: "❄️🐦", rarity: "rare" }
   ],
   grass: [
     { name: "妙蛙種子", sprite: "🌱🐸", rarity: "common" },
@@ -25,7 +25,7 @@ const pokemonData = {
     { name: "菊草葉", sprite: "🍃", rarity: "common" },
     { name: "葉伊布", sprite: "🌿🦊", rarity: "uncommon" },
     { name: "妙蛙花", sprite: "🌺🐸", rarity: "rare" },
-    { name: "閃電鳥", sprite: "🐦⚡", rarity: "rare" } // 雖然是電，但放這當彩蛋
+    { name: "閃電鳥", sprite: "⚡🐦", rarity: "rare" }
   ]
 };
 
@@ -50,7 +50,7 @@ let wins = 0;
 let losses = 0;
 let draws = 0;
 let streak = 0;
-let collection = new Set(); // 用名字當 key
+let collection = new Set();
 
 // DOM
 const typeSelect = document.getElementById("typeSelect");
@@ -106,7 +106,120 @@ drawBtn.addEventListener("click", () => {
   updatePokemonCard("player", playerPokemon, playerType);
   updatePokemonCard("opponent", opponentPokemon, opponentType);
 
-  // 稍微延遲再顯示結果（增加感覺）
+  // 稍微延遲再顯示結果
   setTimeout(() => {
-    const outc
-... 
+    const outcome = decideWinner(playerType, opponentType);
+    showResult(outcome);
+  }, 600);
+});
+
+// 下一局
+nextRoundBtn.addEventListener("click", () => {
+  resetRound();
+});
+
+function getRandomPokemon(type) {
+  const list = pokemonData[type];
+  const weighted = [];
+  list.forEach(p => {
+    const weight = p.rarity === "rare" ? 1 : p.rarity === "uncommon" ? 3 : 6;
+    for (let i = 0; i < weight; i++) weighted.push(p);
+  });
+  return weighted[Math.floor(Math.random() * weighted.length)];
+}
+
+function updatePokemonCard(who, poke, type) {
+  if (who === "player") {
+    playerSprite.textContent = poke.sprite;
+    playerSprite.classList.add("bounce");
+    playerName.textContent = poke.name;
+    playerTypeBadge.textContent = typeNames[type];
+    playerTypeBadge.className = "pokemon-type " + type;
+  } else {
+    opponentSprite.textContent = poke.sprite;
+    opponentSprite.classList.add("bounce");
+    opponentName.textContent = poke.name;
+    opponentTypeBadge.textContent = typeNames[type];
+    opponentTypeBadge.className = "pokemon-type " + type;
+  }
+  setTimeout(() => {
+    playerSprite.classList.remove("bounce");
+    opponentSprite.classList.remove("bounce");
+  }, 400);
+}
+
+function decideWinner(pType, oType) {
+  if (pType === oType) return "draw";
+  if (typeBeats[pType] === oType) return "win";
+  return "lose";
+}
+
+function showResult(outcome) {
+  resultArea.classList.remove("hidden", "win", "lose", "draw");
+  resultArea.classList.add(outcome);
+
+  if (outcome === "win") {
+    wins++;
+    streak++;
+    resultText.textContent = `🎉 勝利！你的 ${playerPokemon.name} 贏了！`;
+    if (!collection.has(playerPokemon.name)) {
+      collection.add(playerPokemon.name);
+      addToCollection(playerPokemon, playerType);
+    }
+  } else if (outcome === "lose") {
+    losses++;
+    streak = 0;
+    resultText.textContent = `😢 失敗…對手的 ${opponentPokemon.name} 比較強`;
+  } else {
+    draws++;
+    resultText.textContent = `🤝 平手！屬性相同`;
+  }
+
+  updateScore();
+}
+
+function addToCollection(poke, type) {
+  const empty = collectionList.querySelector(".empty");
+  if (empty) empty.remove();
+
+  const item = document.createElement("div");
+  item.className = "collection-item";
+  item.innerHTML = `
+    <span class="sprite">${poke.sprite}</span>
+    <span>${poke.name}</span>
+  `;
+  collectionList.appendChild(item);
+  collectionCount.textContent = `(${collection.size})`;
+}
+
+function updateScore() {
+  winsEl.textContent = wins;
+  lossesEl.textContent = losses;
+  drawsEl.textContent = draws;
+  streakEl.textContent = streak;
+}
+
+function resetRound() {
+  playerType = null;
+  playerPokemon = null;
+  opponentPokemon = null;
+  opponentType = null;
+
+  typeSelect.classList.remove("hidden");
+  drawArea.classList.add("hidden");
+  battleArea.classList.add("hidden");
+  resultArea.classList.add("hidden");
+  drawBtn.disabled = false;
+
+  playerSprite.textContent = "❓";
+  playerName.textContent = "---";
+  playerTypeBadge.textContent = "";
+  playerTypeBadge.className = "pokemon-type";
+  opponentSprite.textContent = "❓";
+  opponentName.textContent = "---";
+  opponentTypeBadge.textContent = "";
+  opponentTypeBadge.className = "pokemon-type";
+}
+
+// 初始化
+updateScore();
